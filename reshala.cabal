@@ -1,0 +1,42 @@
+cabal-version:      3.14
+name:               reshala
+version:            0.0.0.0
+license:            BSD-3-Clause
+license-file:       LICENSE
+build-type:         Simple
+
+common warnings
+    ghc-options: -Wall
+
+library
+    import:           warnings
+    exposed-modules:  Reshala
+    -- other-modules:
+    -- other-extensions:
+    build-depends:    base ^>=4.20.0.0
+    hs-source-dirs:   src
+    default-language: GHC2024
+
+executable reshala
+    import:           warnings
+    main-is:          Main.hs
+    -- other-modules:
+    -- other-extensions:
+    build-depends:
+        base ^>=4.20.0.0,
+        reshala
+
+    hs-source-dirs:   app
+    default-language: GHC2024
+
+test-suite reshala-test
+    import:           warnings
+    default-language: GHC2024
+    -- other-modules:
+    -- other-extensions:
+    type:             exitcode-stdio-1.0
+    hs-source-dirs:   test
+    main-is:          Main.hs
+    build-depends:
+        base ^>=4.20.0.0,
+        reshala
