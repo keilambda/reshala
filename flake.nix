@@ -16,7 +16,7 @@
       pkgs = import nixpkgs { localSystem = { inherit system; }; };
       hpkgs = pkgs.haskell.packages."ghc912";
 
-      reshala = pkgs.haskell.lib.overrideCabal (hpkgs.callCabal2nix "reshala" ./api { }) (old: {
+      reshala = pkgs.haskell.lib.overrideCabal (hpkgs.callCabal2nix "reshala" ./. { }) (old: {
         doCheck = true;
         doHaddock = false;
         enableLibraryProfiling = false;
