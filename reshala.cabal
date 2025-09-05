@@ -5,35 +5,35 @@ license:            BSD-3-Clause
 license-file:       LICENSE
 build-type:         Simple
 
+common defaults
+  default-language:   GHC2024
+  default-extensions:
+    BlockArguments
+    DeriveAnyClass
+
 common warnings
-    ghc-options: -Wall
+  ghc-options:
+    -Wall -Wextra -Weverything -Wcompat -Wno-implicit-prelude
+    -Wno-unsafe -Wno-missing-safe-haskell-mode
+    -Wno-missing-local-signatures -Wno-missing-import-lists -haddock
+    -Wno-orphans
 
 library
-    import:           warnings
-    exposed-modules:  Reshala
-    -- other-modules:
-    -- other-extensions:
-    build-depends:    base
+    import:           defaults, warnings
     hs-source-dirs:   src
-    default-language: GHC2024
+    exposed-modules:  Reshala
+    build-depends:    base
 
 executable reshala
-    import:           warnings
+    import:           defaults, warnings
+    hs-source-dirs:   app
     main-is:          Main.hs
-    -- other-modules:
-    -- other-extensions:
     build-depends:
         base,
         reshala
 
-    hs-source-dirs:   app
-    default-language: GHC2024
-
 test-suite reshala-test
-    import:           warnings
-    default-language: GHC2024
-    -- other-modules:
-    -- other-extensions:
+    import:           defaults, warnings
     type:             exitcode-stdio-1.0
     hs-source-dirs:   test
     main-is:          Main.hs
