@@ -36,6 +36,7 @@ library
     Pre
     Reshala
     Reshala.SAT
+    Reshala.SAT.CNF
 
   build-depends:
     , base
