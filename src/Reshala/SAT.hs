@@ -67,6 +67,12 @@ deMorgan = \case
   Not (a :| b) -> Just (Not a :& Not b)
   _ -> Nothing
 
+distribute :: Rewrite
+distribute = \case
+  a :| (b :& c) -> Just (a :| b :& a :| c)
+  (a :& b) :| c -> Just (a :| b :& a :| c)
+  _ -> Nothing
+
 simp :: Expr -> Expr
 simp = rewrite rws
  where
@@ -74,6 +80,7 @@ simp = rewrite rws
   rules =
     [ step
     , deMorgan
+    , distribute
     ]
 
 sat :: Expr -> Bool
