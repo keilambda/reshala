@@ -6,7 +6,7 @@ module Reshala.SAT
   , Clause
   , Formula
   , free
-  , guess
+  , subst
   , simp
   , sat
   ) where
@@ -44,8 +44,8 @@ free = cata alg
     a :&$ b -> a <|> b
     a :|$ b -> a <|> b
 
-guess :: Char -> Bool -> Expr -> Expr
-guess var val = cata alg
+subst :: Char -> Bool -> Expr -> Expr
+subst var val = cata alg
  where
   alg (VarF v) | v == var = Lit val
   alg a = embed a
@@ -71,8 +71,8 @@ sat :: Expr -> Bool
 sat expr = case free expr of
   Nothing -> unLit expr
   Just v ->
-    let true = simp (guess v True expr)
-        false = simp (guess v False expr)
+    let true = simp (subst v True expr)
+        false = simp (subst v False expr)
      in sat true || sat false
   where
     unLit = \case Lit b -> b; _ -> error "unLit: not a Lit"
