@@ -1,9 +1,9 @@
-cabal-version:      3.14
-name:               reshala
-version:            0.0.0.0
-license:            BSD-3-Clause
-license-file:       LICENSE
-build-type:         Simple
+cabal-version: 3.0
+name:          reshala
+version:       0.0.0.0
+license:       BSD-3-Clause
+license-file:  LICENSE
+build-type:    Simple
 
 common defaults
   default-language:   GHC2024
@@ -19,24 +19,27 @@ common warnings
     -Wno-orphans
 
 library
-    import:           defaults, warnings
-    hs-source-dirs:   src
-    exposed-modules:  Reshala, Reshala.SAT
-    build-depends:    base
+  import:          defaults, warnings
+  hs-source-dirs:  src
+  exposed-modules:
+    Reshala
+    Reshala.SAT
+
+  build-depends:   base
 
 executable reshala
-    import:           defaults, warnings
-    hs-source-dirs:   app
-    main-is:          Main.hs
-    build-depends:
-        base,
-        reshala
+  import:         defaults, warnings
+  hs-source-dirs: app
+  main-is:        Main.hs
+  build-depends:
+    , base
+    , reshala
 
 test-suite reshala-test
-    import:           defaults, warnings
-    type:             exitcode-stdio-1.0
-    hs-source-dirs:   test
-    main-is:          Main.hs
-    build-depends:
-        base,
-        reshala
+  import:         defaults, warnings
+  type:           exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is:        Main.hs
+  build-depends:
+    , base
+    , reshala
