@@ -13,6 +13,7 @@ import Control.Applicative ((<|>))
 import Data.Data (Data)
 import Data.Functor.Foldable
 import Data.Functor.Foldable.TH
+import Data.Maybe (fromMaybe)
 import Pre
 
 data Expr
@@ -74,14 +75,19 @@ distribute = \case
   _ -> Nothing
 
 simp :: Expr -> Expr
-simp = rewrite rws
- where
-  rws e = asum (map ($ e) rules)
-  rules =
-    [ step
-    , deMorgan
-    , distribute
-    ]
+simp = rewrite step
+
+apply :: Rewrite -> (Expr -> Expr)
+apply rule expr = fromMaybe expr (rule expr)
+
+toNNF :: Expr -> Expr
+toNNF = transform (apply deMorgan)
+
+distributeCNF :: Expr -> Expr
+distributeCNF = transform (apply distribute)
+
+normalize :: Expr -> Expr
+normalize = simp . distributeCNF . toNNF . simp
 
 sat :: Expr -> Bool
 sat expr = case free expr of
@@ -89,6 +95,6 @@ sat expr = case free expr of
     Lit b -> b
     _ -> error "sat: not a Lit"
   Just v ->
-    let true = simp (subst v True expr)
-        false = simp (subst v False expr)
+    let true = normalize (subst v True expr)
+        false = normalize (subst v False expr)
      in sat true || sat false
