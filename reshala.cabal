@@ -21,7 +21,7 @@ common warnings
 library
     import:           defaults, warnings
     hs-source-dirs:   src
-    exposed-modules:  Reshala
+    exposed-modules:  Reshala, Reshala.SAT
     build-depends:    base
 
 executable reshala
