@@ -137,9 +137,9 @@ elim expr =
 propagation :: Expr -> Expr
 propagation expr = foldl' (.) id (map (uncurry subst) unitClauses) expr
  where
-  unitClauses = mapMaybe f . clauses $ expr
+  unitClauses = mapMaybe go . clauses $ expr
 
-  f = \case
+  go = \case
     (Var v) -> Just (v, True)
     (Not (Var v)) -> Just (v, False)
     _ -> Nothing
