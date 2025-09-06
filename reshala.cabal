@@ -13,10 +13,15 @@ common defaults
 
 common warnings
   ghc-options:
-    -Wall -Wextra -Weverything -Wcompat -Wno-implicit-prelude
+    -Wall -Wextra -Weverything -Wcompat -Werror -Wno-implicit-prelude
     -Wno-unsafe -Wno-missing-safe-haskell-mode
     -Wno-missing-local-signatures -Wno-missing-import-lists -haddock
-    -Wno-orphans
+    -Wno-orphans -fhide-source-paths -Wno-missing-exported-signatures
+    -Wno-missing-kind-signatures -Wno-missed-specialisations
+    -Wno-all-missed-specialisations -Wno-safe
+    -Wno-monomorphism-restriction -Wno-prepositive-qualified-module
+    -Wno-unused-packages -Wno-missing-role-annotations
+    -Wno-missing-poly-kind-signatures
 
 library
   import:          defaults, warnings
