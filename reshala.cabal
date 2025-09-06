@@ -40,6 +40,7 @@ library
 
   build-depends:
     , base
+    , containers
     , generic-lens
     , lens
     , recursion-schemes
