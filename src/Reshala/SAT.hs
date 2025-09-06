@@ -11,7 +11,7 @@ module Reshala.SAT
   , satDPLL
   , polarity
   , elim
-  , unitPropagation
+  , propagation
   ) where
 
 import Control.Applicative ((<|>))
@@ -134,20 +134,18 @@ elim expr =
     Just Neg -> Just (v, False)
     _ -> Nothing
 
-clauses :: Expr -> List Expr
-clauses (a :& b) = clauses a ++ clauses b
-clauses expr = [expr]
-
-unitClauses :: Expr -> List (Char, Bool)
-unitClauses = mapMaybe f . clauses
+propagation :: Expr -> Expr
+propagation expr = foldl' (.) id (map (uncurry subst) unitClauses) expr
  where
+  unitClauses = mapMaybe f . clauses $ expr
+
   f = \case
     (Var v) -> Just (v, True)
     (Not (Var v)) -> Just (v, False)
     _ -> Nothing
 
-unitPropagation :: Expr -> Expr
-unitPropagation expr = foldl' (.) id (map (uncurry subst) (unitClauses expr)) expr
+  clauses (a :& b) = clauses a ++ clauses b
+  clauses a = [a]
 
 unLit :: Expr -> Bool
 unLit = \case Lit b -> b; _ -> error "unLit: not a Lit"
@@ -168,4 +166,4 @@ satDPLL expr = case free expr' of
         false = simp (subst v False expr)
      in satDPLL true || satDPLL false
  where
-  expr' = elim . cnf . unitPropagation $ expr
+  expr' = elim . cnf . propagation $ expr
