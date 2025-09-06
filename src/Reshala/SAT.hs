@@ -71,6 +71,9 @@ step = \case
   (_ :| Lit True) -> Just (Lit True)
   _ -> Nothing
 
+simp :: Expr -> Expr
+simp = rewrite step
+
 deMorgan :: Rewrite
 deMorgan = \case
   Not (a :& b) -> Just (Not a :| Not b)
@@ -82,9 +85,6 @@ distribute = \case
   a :| (b :& c) -> Just (a :| b :& a :| c)
   (a :& b) :| c -> Just (a :| c :& b :| c)
   _ -> Nothing
-
-simp :: Expr -> Expr
-simp = rewrite step
 
 apply :: Rewrite -> (Expr -> Expr)
 apply rule expr = fromMaybe expr (rule expr)
