@@ -37,7 +37,9 @@ library
     Reshala
     Reshala.SAT
 
-  build-depends:   base
+  build-depends:
+    , base
+    , recursion-schemes
 
 executable reshala
   import:         defaults, warnings
