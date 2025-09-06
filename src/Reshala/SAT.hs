@@ -64,10 +64,10 @@ simp = rewrite step
 
 sat :: Expr -> Bool
 sat expr = case free expr of
-  Nothing -> unLit expr
+  Nothing -> case expr of
+    Lit b -> b
+    _ -> error "sat: not a Lit"
   Just v ->
     let true = simp (subst v True expr)
         false = simp (subst v False expr)
      in sat true || sat false
-  where
-    unLit = \case Lit b -> b; _ -> error "unLit: not a Lit"
