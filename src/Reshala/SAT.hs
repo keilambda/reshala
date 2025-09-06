@@ -8,6 +8,7 @@ module Reshala.SAT
   , subst
   , simp
   , sat
+  , satDPLL
   , polarity
   , elim
   , unitPropagation
@@ -17,7 +18,7 @@ import Control.Applicative ((<|>))
 import Data.Data (Data)
 import Data.Functor.Foldable
 import Data.Functor.Foldable.TH
-import Data.Maybe (catMaybes, fromMaybe, mapMaybe)
+import Data.Maybe (catMaybes, mapMaybe)
 import Data.Set (Set)
 import Data.Set qualified as Set
 import Pre
@@ -77,29 +78,28 @@ step = \case
 simp :: Expr -> Expr
 simp = rewrite step
 
-deMorgan :: Rewrite
-deMorgan = \case
-  Not (a :& b) -> Just (Not a :| Not b)
-  Not (a :| b) -> Just (Not a :& Not b)
-  _ -> Nothing
-
-distribute :: Rewrite
-distribute = \case
-  a :| (b :& c) -> Just (a :| b :& a :| c)
-  (a :& b) :| c -> Just (a :| c :& b :| c)
-  _ -> Nothing
-
-apply :: Rewrite -> (Expr -> Expr)
-apply rule expr = fromMaybe expr (rule expr)
+distribute :: Expr -> Expr
+distribute = cata alg
+ where
+  alg = \case
+    a :|$ (b :& c) -> (a :| b) :& (a :| c)
+    (a :& b) :|$ c -> (a :| c) :& (b :| c)
+    expr -> embed expr
 
 toNNF :: Expr -> Expr
-toNNF = transform (apply deMorgan)
+toNNF = cata alg
+ where
+  alg = \case
+    NotF (Not e) -> e
+    NotF (a :& b) -> Not a :| Not b
+    NotF (a :| b) -> Not a :& Not b
+    NotF (Lit b) -> Lit (not b)
+    expr -> embed expr
 
-distributeCNF :: Expr -> Expr
-distributeCNF = transform (apply distribute)
-
-normalize :: Expr -> Expr
-normalize = simp . distributeCNF . toNNF . simp
+cnf :: Expr -> Expr
+cnf expr = if updated == expr then expr else cnf updated
+ where
+  updated = distribute (toNNF expr)
 
 data Polarity = Pos | Neg | Mix
   deriving stock (Eq)
@@ -149,12 +149,23 @@ unitClauses = mapMaybe f . clauses
 unitPropagation :: Expr -> Expr
 unitPropagation expr = foldl' (.) id (map (uncurry subst) (unitClauses expr)) expr
 
+unLit :: Expr -> Bool
+unLit = \case Lit b -> b; _ -> error "unLit: not a Lit"
+
 sat :: Expr -> Bool
 sat expr = case free expr of
-  Nothing -> case expr of
-    Lit b -> b
-    _ -> error "sat: not a Lit"
+  Nothing -> unLit expr
   Just v ->
-    let true = normalize (subst v True expr)
-        false = normalize (subst v False expr)
+    let true = simp (subst v True expr)
+        false = simp (subst v False expr)
      in sat true || sat false
+
+satDPLL :: Expr -> Bool
+satDPLL expr = case free expr' of
+  Nothing -> unLit (simp expr')
+  Just v ->
+    let true = simp (subst v True expr)
+        false = simp (subst v False expr)
+     in satDPLL true || satDPLL false
+ where
+  expr' = elim . cnf . unitPropagation $ expr
