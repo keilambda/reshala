@@ -59,8 +59,20 @@ step = \case
   (_ :| Lit True) -> Just (Lit True)
   _ -> Nothing
 
+deMorgan :: Expr -> Maybe Expr
+deMorgan = \case
+  Not (a :& b) -> Just (Not a :| Not b)
+  Not (a :| b) -> Just (Not a :& Not b)
+  _ -> Nothing
+
 simp :: Expr -> Expr
-simp = rewrite step
+simp = rewrite rws
+ where
+  rws e = asum (map ($ e) rules)
+  rules =
+    [ step
+    , deMorgan
+    ]
 
 sat :: Expr -> Bool
 sat expr = case free expr of
