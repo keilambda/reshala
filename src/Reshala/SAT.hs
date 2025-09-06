@@ -10,6 +10,7 @@ module Reshala.SAT
   , sat
   , polarity
   , elim
+  , unitPropagation
   ) where
 
 import Control.Applicative ((<|>))
@@ -132,6 +133,21 @@ elim expr =
     Just Pos -> Just (v, True)
     Just Neg -> Just (v, False)
     _ -> Nothing
+
+clauses :: Expr -> List Expr
+clauses (a :& b) = clauses a ++ clauses b
+clauses expr = [expr]
+
+unitClauses :: Expr -> List (Char, Bool)
+unitClauses = mapMaybe f . clauses
+ where
+  f = \case
+    (Var v) -> Just (v, True)
+    (Not (Var v)) -> Just (v, False)
+    _ -> Nothing
+
+unitPropagation :: Expr -> Expr
+unitPropagation expr = foldl' (.) id (map (uncurry subst) (unitClauses expr)) expr
 
 sat :: Expr -> Bool
 sat expr = case free expr of
