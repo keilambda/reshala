@@ -4,6 +4,7 @@
 module Reshala.SAT
   ( Expr (..)
   , free
+  , vars
   , subst
   , simp
   , sat
@@ -14,6 +15,8 @@ import Data.Data (Data)
 import Data.Functor.Foldable
 import Data.Functor.Foldable.TH
 import Data.Maybe (fromMaybe)
+import Data.Set (Set)
+import Data.Set qualified as Set
 import Pre
 
 data Expr
@@ -39,6 +42,12 @@ free = cata alg
     NotF a -> a
     a :&$ b -> a <|> b
     a :|$ b -> a <|> b
+
+vars :: Expr -> Set Char
+vars = foldMap alg . universe
+ where
+  alg (Var v) = Set.singleton v
+  alg _ = mempty
 
 subst :: Char -> Bool -> Expr -> Expr
 subst var val = cata alg
