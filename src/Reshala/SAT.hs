@@ -70,7 +70,7 @@ deMorgan = \case
 distribute :: Rewrite
 distribute = \case
   a :| (b :& c) -> Just (a :| b :& a :| c)
-  (a :& b) :| c -> Just (a :| b :& a :| c)
+  (a :& b) :| c -> Just (a :| c :& b :| c)
   _ -> Nothing
 
 simp :: Expr -> Expr
