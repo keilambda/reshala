@@ -45,7 +45,9 @@ subst var val = cata alg
   alg (VarF v) | v == var = Lit val
   alg a = embed a
 
-step :: Expr -> Maybe Expr
+type Rewrite = Expr -> Maybe Expr
+
+step :: Rewrite
 step = \case
   (Not (Lit b)) -> Just (Lit (not b))
   (Not (Not a)) -> Just a
@@ -59,7 +61,7 @@ step = \case
   (_ :| Lit True) -> Just (Lit True)
   _ -> Nothing
 
-deMorgan :: Expr -> Maybe Expr
+deMorgan :: Rewrite
 deMorgan = \case
   Not (a :& b) -> Just (Not a :| Not b)
   Not (a :| b) -> Just (Not a :& Not b)
