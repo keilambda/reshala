@@ -39,6 +39,8 @@ library
 
   build-depends:
     , base
+    , generic-lens
+    , lens
     , recursion-schemes
 
 executable reshala
