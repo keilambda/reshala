@@ -3,8 +3,6 @@
 
 module Reshala.SAT
   ( Expr (..)
-  , Clause
-  , Formula
   , free
   , subst
   , simp
@@ -30,9 +28,6 @@ infixl 7 :&
 infixl 6 :|
 
 makeBaseFunctor ''Expr
-
-type Clause = List Expr
-type Formula = List Clause
 
 free :: Expr -> Maybe Char
 free = cata alg
