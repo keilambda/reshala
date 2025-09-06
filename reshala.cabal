@@ -33,6 +33,7 @@ library
   import:          defaults, warnings
   hs-source-dirs:  src
   exposed-modules:
+    Pre
     Reshala
     Reshala.SAT
 
