@@ -44,6 +44,7 @@ library
     , containers
     , generic-lens
     , lens
+    , nonempty-containers
     , recursion-schemes
 
 executable reshala
