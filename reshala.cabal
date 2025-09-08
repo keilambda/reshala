@@ -15,7 +15,6 @@ common defaults
     MonoLocalBinds
     MultilineStrings
     NoFieldSelectors
-    NoImplicitPrelude
     OrPatterns
 
 common warnings
@@ -38,6 +37,9 @@ library
     Reshala
     Reshala.SAT
     Reshala.SAT.CNF
+
+  default-extensions:
+    NoImplicitPrelude
 
   build-depends:
     , base
