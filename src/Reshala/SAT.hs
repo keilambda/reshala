@@ -27,13 +27,13 @@ data Expr
   = Lit Bool
   | Var Char
   | Not Expr
-  | Expr :& Expr
-  | Expr :| Expr
+  | Expr :&: Expr
+  | Expr :|: Expr
   deriving stock (Data, Eq, Generic, Show)
   deriving anyclass (Plated)
 
-infixl 7 :&
-infixl 6 :|
+infixl 7 :&:
+infixl 6 :|:
 
 makeBaseFunctor ''Expr
 
@@ -44,8 +44,8 @@ free = cata alg
     LitF _ -> Nothing
     VarF v -> Just v
     NotF a -> a
-    a :&$ b -> a <|> b
-    a :|$ b -> a <|> b
+    a :&:$ b -> a <|> b
+    a :|:$ b -> a <|> b
 
 vars :: Expr -> Set Char
 vars = foldMap alg . universe
@@ -65,14 +65,14 @@ step :: Rewrite
 step = \case
   (Not (Lit b)) -> Just (Lit (not b))
   (Not (Not a)) -> Just a
-  (Lit True :& a) -> Just a
-  (a :& Lit True) -> Just a
-  (Lit False :& _) -> Just (Lit False)
-  (_ :& Lit False) -> Just (Lit False)
-  (Lit False :| a) -> Just a
-  (a :| Lit False) -> Just a
-  (Lit True :| _) -> Just (Lit True)
-  (_ :| Lit True) -> Just (Lit True)
+  (Lit True :&: a) -> Just a
+  (a :&: Lit True) -> Just a
+  (Lit False :&: _) -> Just (Lit False)
+  (_ :&: Lit False) -> Just (Lit False)
+  (Lit False :|: a) -> Just a
+  (a :|: Lit False) -> Just a
+  (Lit True :|: _) -> Just (Lit True)
+  (_ :|: Lit True) -> Just (Lit True)
   _ -> Nothing
 
 simp :: Expr -> Expr
@@ -82,8 +82,8 @@ distribute :: Expr -> Expr
 distribute = cata alg
  where
   alg = \case
-    a :|$ (b :& c) -> (a :| b) :& (a :| c)
-    (a :& b) :|$ c -> (a :| c) :& (b :| c)
+    a :|:$ (b :&: c) -> (a :|: b) :&: (a :|: c)
+    (a :&: b) :|:$ c -> (a :|: c) :&: (b :|: c)
     expr -> embed expr
 
 toNNF :: Expr -> Expr
@@ -91,8 +91,8 @@ toNNF = cata alg
  where
   alg = \case
     NotF (Not e) -> e
-    NotF (a :& b) -> Not a :| Not b
-    NotF (a :| b) -> Not a :& Not b
+    NotF (a :&: b) -> Not a :|: Not b
+    NotF (a :|: b) -> Not a :&: Not b
     NotF (Lit b) -> Lit (not b)
     expr -> embed expr
 
@@ -112,8 +112,8 @@ polarity (Not (Var v)) v'
   | v == v' = Just Neg
   | otherwise = Nothing
 polarity expr v = case expr of
-  a :& b -> comb [a, b]
-  a :| b -> comb [a, b]
+  a :&: b -> comb [a, b]
+  a :|: b -> comb [a, b]
   Not a -> error $ "polarity: not in CNF: negation of a non-literal: " ++ show a
   Lit _ -> Nothing
  where
@@ -144,7 +144,7 @@ propagation expr = foldl' (.) id (map (uncurry subst) unitClauses) expr
     (Not (Var v)) -> Just (v, False)
     _ -> Nothing
 
-  clauses (a :& b) = clauses a ++ clauses b
+  clauses (a :&: b) = clauses a ++ clauses b
   clauses a = [a]
 
 unLit :: Expr -> Bool
