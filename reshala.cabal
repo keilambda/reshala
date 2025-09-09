@@ -30,17 +30,16 @@ common warnings
     -Wno-missing-poly-kind-signatures
 
 library
-  import:          defaults, warnings
-  hs-source-dirs:  src
+  import:             defaults, warnings
+  hs-source-dirs:     src
   exposed-modules:
     Pre
     Reshala
     Reshala.SAT
     Reshala.SAT.CNF
+    Reshala.SAT.Expr
 
-  default-extensions:
-    NoImplicitPrelude
-
+  default-extensions: NoImplicitPrelude
   build-depends:
     , base
     , containers
