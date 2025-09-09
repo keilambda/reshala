@@ -1,6 +1,3 @@
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeFamilies #-}
-
 module Reshala.SAT
   ( Var
   , Expr (..)
@@ -8,26 +5,9 @@ module Reshala.SAT
   ) where
 
 import Control.Applicative
-import Data.Data (Data)
 import Data.Functor.Foldable
-import Data.Functor.Foldable.TH
 import Pre
-
-type Var = Char
-
-data Expr
-  = Lit Bool
-  | Var Var
-  | Not Expr
-  | Expr :&: Expr
-  | Expr :|: Expr
-  deriving stock (Data, Eq, Generic, Show)
-  deriving anyclass (Plated)
-
-infixl 7 :&:
-infixl 6 :|:
-
-makeBaseFunctor ''Expr
+import Reshala.SAT.Expr
 
 pop :: Expr -> Maybe Var
 pop = cata \case

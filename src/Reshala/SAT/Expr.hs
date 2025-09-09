@@ -1,1 +1,29 @@
-module Reshala.SAT.Expr () where
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TypeFamilies #-}
+
+module Reshala.SAT.Expr
+  ( Var
+  , Expr (..)
+  , ExprF (..)
+  ) where
+
+import Data.Data (Data)
+import Data.Functor.Foldable.TH
+import Pre
+
+type Var = Char
+
+data Expr
+  = Lit Bool
+  | Var Var
+  | Not Expr
+  | Expr :&: Expr
+  | Expr :|: Expr
+  deriving stock (Data, Eq, Generic, Show)
+  deriving anyclass (Plated)
+
+infixl 7 :&:
+infixl 6 :|:
+
+makeBaseFunctor ''Expr
+type ExprF :: Type -> Type
