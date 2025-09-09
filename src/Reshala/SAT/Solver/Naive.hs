@@ -5,6 +5,7 @@ module Reshala.SAT.Solver.Naive
 import Control.Applicative
 import Data.Functor.Foldable
 import Pre
+import Reshala.SAT
 import Reshala.SAT.Expr
 
 pop :: Expr -> Maybe Var
@@ -35,3 +36,8 @@ sat expr = case pop expr of
     let true = subst var True expr
     let false = subst var False expr
     sat true || sat false
+
+newtype Naive = MkNaive Expr
+
+instance Solver Naive where
+  solve (MkNaive s) = sat s
