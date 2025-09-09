@@ -39,6 +39,7 @@ library
     Reshala.SAT.CNF
     Reshala.SAT.Expr
     Reshala.SAT.Solver.Naive
+    Reshala.SAT.Solver.Table
 
   default-extensions: NoImplicitPrelude
   build-depends:
