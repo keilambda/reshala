@@ -38,6 +38,7 @@ library
     Reshala.SAT
     Reshala.SAT.CNF
     Reshala.SAT.Expr
+    Reshala.SAT.Parser
     Reshala.SAT.Solver.Naive
     Reshala.SAT.Solver.Table
 
