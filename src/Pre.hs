@@ -7,6 +7,7 @@ module Pre
   , Map
   , NESet
   , Set
+  , Text
   , Type
   , Constraint
   ) where
@@ -18,5 +19,6 @@ import Data.List (List)
 import Data.Map.Strict (Map)
 import Data.Set (Set)
 import Data.Set.NonEmpty (NESet)
+import Data.Text (Text)
 import GHC.Generics (Generic)
 import Prelude

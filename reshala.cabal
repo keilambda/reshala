@@ -51,6 +51,7 @@ library
     , megaparsec
     , nonempty-containers
     , recursion-schemes
+    , text
 
 executable reshala
   import:         defaults, warnings
