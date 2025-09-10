@@ -1,6 +1,6 @@
 module Reshala.SAT.Solver.Table
   ( sat
-  , solutions
+  , sol
   ) where
 
 import Control.Monad (replicateM)
@@ -32,13 +32,13 @@ assignments vs =
   | bs <- replicateM (length vs) [False, True]
   ]
 
-solutions :: Expr -> List Solution
-solutions e = filter (`eval` e) . assignments . toList . vars $ e
+sol :: Expr -> List Solution
+sol e = filter (`eval` e) . assignments . toList . vars $ e
 
 sat :: Expr -> Bool
-sat = not . null . solutions
+sat = not . null . sol
 
 newtype Table = MkTable Expr
 
 instance Solver Table where
-  solve (MkTable e) = sat e
+  solutions (MkTable e) = sol e
