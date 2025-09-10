@@ -1,6 +1,9 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Main (main) where
 
 import Data.Foldable
+import Data.Text qualified as Text
 import Data.Map.Strict ((!))
 import Data.Map.Strict qualified as Map
 import Data.Set qualified as Set
@@ -45,17 +48,17 @@ unitTests =
         Naive.sol e @?= []
         Table.sol e @?= []
     , testCase "a OR not a is a tautology" do
-        let a = Var 'a'
+        let a = Var "a"
         let e = a :|: Not a
         Naive.sat e @?= True
         Table.sat e @?= True
         let solsN = Set.fromList (Naive.sol e)
         let solsT = Set.fromList (Table.sol e)
-        let all2 = Set.fromList [Map.fromList [('a', False)], Map.fromList [('a', True)]]
+        let all2 = Set.fromList [Map.fromList [("a", False)], Map.fromList [("a", True)]]
         solsN @?= all2
         solsT @?= all2
     , testCase "a AND not a is a contradiction" do
-        let a = Var 'a'
+        let a = Var "a"
         let e = a :&: Not a
         Naive.sat e @?= False
         Table.sat e @?= False
@@ -77,7 +80,7 @@ propertyTests =
     ]
 
 genVar :: Gen Var
-genVar = Gen.element ['a' .. 'z']
+genVar = Text.singleton <$> Gen.element ['a' .. 'z']
 
 genExpr :: Gen Expr
 genExpr =

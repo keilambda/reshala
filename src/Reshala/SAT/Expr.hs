@@ -12,7 +12,7 @@ import Data.Data (Data)
 import Data.Functor.Foldable.TH
 import Pre
 
-type Var = Char
+type Var = Text
 
 data Expr
   = Lit Bool
