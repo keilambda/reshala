@@ -3,10 +3,10 @@
 module Main (main) where
 
 import Data.Foldable
-import Data.Text qualified as Text
 import Data.Map.Strict ((!))
 import Data.Map.Strict qualified as Map
 import Data.Set qualified as Set
+import Data.Text qualified as Text
 import Hedgehog hiding (Var)
 import Hedgehog.Gen qualified as Gen
 import Hedgehog.Range qualified as Range
@@ -14,6 +14,7 @@ import Pre
 import Reshala.SAT.CNF
 import Reshala.SAT.CNF qualified as CNF
 import Reshala.SAT.Expr
+import Reshala.SAT.Parser qualified as Parser
 import Reshala.SAT.Solver.Naive qualified as Naive
 import Reshala.SAT.Solver.Table qualified as Table
 import Test.Tasty
@@ -64,7 +65,15 @@ unitTests =
         Table.sat e @?= False
         Naive.sol e @?= []
         Table.sol e @?= []
+    , testCase "parse basic precedence and unary" do
+        parse "a && !b || true" @?= Right ((Var "a" :&: Not (Var "b")) :|: Lit True)
+    , testCase "parse implies/iff/xor desugar" do
+        parse "a -> b" @?= Right (Not (Var "a") :|: Var "b")
+        parse "a <-> b" @?= Right ((Var "a" :&: Var "b") :|: (Not (Var "a") :&: Not (Var "b")))
+        parse "a ^ b" @?= Right ((Var "a" :|: Var "b") :&: Not (Var "a" :&: Var "b"))
     ]
+ where
+  parse = Parser.run "test"
 
 propertyTests :: TestTree
 propertyTests =
