@@ -29,8 +29,19 @@ common warnings
     -Wno-unused-packages -Wno-missing-role-annotations
     -Wno-missing-poly-kind-signatures
 
+common deps
+  build-depends:
+    , base
+    , containers
+    , generic-lens
+    , lens
+    , megaparsec
+    , nonempty-containers
+    , recursion-schemes
+    , text
+
 library
-  import:             defaults, warnings
+  import:             defaults, warnings, deps
   hs-source-dirs:     src
   exposed-modules:
     Pre
@@ -43,15 +54,6 @@ library
     Reshala.SAT.Solver.Table
 
   default-extensions: NoImplicitPrelude
-  build-depends:
-    , base
-    , containers
-    , generic-lens
-    , lens
-    , megaparsec
-    , nonempty-containers
-    , recursion-schemes
-    , text
 
 executable reshala
   import:         defaults, warnings
@@ -62,13 +64,11 @@ executable reshala
     , reshala
 
 test-suite reshala-test
-  import:         defaults, warnings
+  import:         defaults, warnings, deps
   type:           exitcode-stdio-1.0
   hs-source-dirs: test
   main-is:        Main.hs
   build-depends:
-    , base
-    , containers
     , hedgehog
     , reshala
     , tasty
