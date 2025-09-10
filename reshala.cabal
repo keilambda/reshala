@@ -48,6 +48,7 @@ library
     , containers
     , generic-lens
     , lens
+    , megaparsec
     , nonempty-containers
     , recursion-schemes
 
