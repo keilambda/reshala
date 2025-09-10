@@ -23,11 +23,11 @@ data Tok
   | And
   | Or
   | Xor
-  | Impl
+  | Imp
   | Iff
   | LPar
   | RPar
-  deriving stock (Eq, Show)
+  deriving stock (Eq, Ord, Show)
 
 sc :: P ()
 sc = Lex.space space1 (Lex.skipLineComment "--") (Lex.skipBlockComment "/*" "*/")
@@ -43,7 +43,7 @@ tok :: P Tok
 tok =
   choice
     [ Iff <$ string "<->"
-    , Impl <$ string "->"
+    , Imp <$ string "->"
     , And <$ string "&&"
     , Or <$ string "||"
     , Xor <$ char '^'
