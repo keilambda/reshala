@@ -16,6 +16,7 @@ common defaults
     MultilineStrings
     NoFieldSelectors
     OrPatterns
+    PatternSynonyms
 
 common warnings
   ghc-options:
@@ -28,6 +29,7 @@ common warnings
     -Wno-monomorphism-restriction -Wno-prepositive-qualified-module
     -Wno-unused-packages -Wno-missing-role-annotations
     -Wno-missing-poly-kind-signatures
+    -Wno-missing-pattern-synonym-signatures
 
 common deps
   build-depends:
@@ -41,6 +43,8 @@ common deps
     , parser-combinators
     , recursion-schemes
     , text
+    , ya
+    , ya-ascii
 
 library
   import:             defaults, warnings, deps
@@ -48,6 +52,7 @@ library
   exposed-modules:
     Pre
     Reshala
+    Reshala.AST
     Reshala.SAT
     Reshala.SAT.CNF
     Reshala.SAT.Expr
