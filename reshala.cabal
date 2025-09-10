@@ -37,6 +37,7 @@ common deps
     , lens
     , megaparsec
     , nonempty-containers
+    , optparse-applicative
     , parser-combinators
     , recursion-schemes
     , text
@@ -58,12 +59,10 @@ library
   default-extensions: NoImplicitPrelude
 
 executable reshala
-  import:         defaults, warnings
+  import:         defaults, warnings, deps
   hs-source-dirs: app
   main-is:        Main.hs
-  build-depends:
-    , base
-    , reshala
+  build-depends:  reshala
 
 test-suite reshala-test
   import:         defaults, warnings, deps
