@@ -37,6 +37,7 @@ common deps
     , lens
     , megaparsec
     , nonempty-containers
+    , parser-combinators
     , recursion-schemes
     , text
 
