@@ -52,6 +52,7 @@ library
     Reshala.SAT.Parser
     Reshala.SAT.Solver.Naive
     Reshala.SAT.Solver.Table
+    Reshala.SAT.Token
 
   default-extensions: NoImplicitPrelude
 
