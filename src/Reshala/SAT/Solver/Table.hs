@@ -11,8 +11,6 @@ import Pre
 import Reshala.SAT
 import Reshala.SAT.Expr
 
-type Solution = Map Var Bool
-
 eval :: Solution -> Expr -> Bool
 eval env = cata \case
   LitF b -> b

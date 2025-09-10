@@ -5,6 +5,7 @@ module Reshala.SAT.Expr
   ( Var
   , Expr (..)
   , ExprF (..)
+  , Solution
   ) where
 
 import Data.Data (Data)
@@ -27,3 +28,5 @@ infixl 6 :|:
 
 makeBaseFunctor ''Expr
 type ExprF :: Type -> Type
+
+type Solution = Map Var Bool
