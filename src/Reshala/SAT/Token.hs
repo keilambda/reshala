@@ -1,1 +1,64 @@
-module Reshala.SAT.Token () where
+{-# LANGUAGE OverloadedStrings #-}
+
+module Reshala.SAT.Token
+  ( P
+  , Tok (..)
+  , toks
+  ) where
+
+import Data.Text qualified as Text
+import Data.Void (Void)
+import Pre hiding (Bool (..))
+import Text.Megaparsec
+import Text.Megaparsec.Char
+import Text.Megaparsec.Char.Lexer qualified as Lex
+
+type P = Parsec Void Text
+
+data Tok
+  = True
+  | False
+  | Ident Text
+  | Not
+  | And
+  | Or
+  | Xor
+  | Impl
+  | Iff
+  | LPar
+  | RPar
+  deriving stock (Eq, Show)
+
+sc :: P ()
+sc = Lex.space space1 (Lex.skipLineComment "--") (Lex.skipBlockComment "/*" "*/")
+
+toks :: P (List Tok)
+toks = do
+  sc
+  ts <- many (tok <* sc)
+  eof
+  pure ts
+
+tok :: P Tok
+tok =
+  choice
+    [ Iff <$ string "<->"
+    , Impl <$ string "->"
+    , And <$ string "&&"
+    , Or <$ string "||"
+    , Xor <$ char '^'
+    , Not <$ char '!'
+    , LPar <$ char '('
+    , RPar <$ char ')'
+    , kwOrIdent <?> "keyword or identifier"
+    ]
+
+kwOrIdent :: P Tok
+kwOrIdent = do
+  first <- letterChar <|> char '_'
+  rest <- many (alphaNumChar <|> char '_')
+  let txt = Text.pack (first : rest)
+  pure case txt of
+    "true" -> True
+    "false" -> False
+    _ -> Ident txt
