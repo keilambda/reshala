@@ -1,6 +1,7 @@
 module Reshala.SAT.Solver.Table
   ( sat
   , sol
+  , Table (..)
   ) where
 
 import Control.Monad (replicateM)

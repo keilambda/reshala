@@ -1,6 +1,7 @@
 module Reshala.SAT.Solver.Naive
   ( sat
   , sol
+  , Naive (..)
   ) where
 
 import Control.Applicative

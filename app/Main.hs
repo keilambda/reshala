@@ -7,42 +7,37 @@ import Data.Text qualified as Text
 import Data.Text.IO qualified as Text
 import Options.Applicative
 import Pre hiding (argument)
+import Reshala.SAT
 import Reshala.SAT.Expr
 import Reshala.SAT.Parser qualified as Parser
-import Reshala.SAT.Solver.Naive qualified as Naive
-import Reshala.SAT.Solver.Table qualified as Table
+import Reshala.SAT.Solver.Naive (Naive (..))
+import Reshala.SAT.Solver.Table (Table (..))
 import System.Exit (exitFailure)
 import System.IO (hPutStrLn, stderr)
 
-data Solver
-  = Naive
-  | Table
+data SolverChoice
+  = UseNaive
+  | UseTable
 
 data Cmd
-  = SatCmd Solver Text
-  | SolCmd Solver Text
+  = SatCmd SolverChoice Text
+  | SolCmd SolverChoice Text
 
 main :: IO ()
 main =
   execParser opts >>= \case
     SatCmd s txt -> do
-      sats <- sat s <$> parseOrDie txt
-      Text.putStrLn if sats then "SAT" else "UNSAT"
+      e <- parseOrDie txt
+      let ok = withSolver s \mk -> satisfiable (mk e)
+      Text.putStrLn (if ok then "SAT" else "UNSAT")
     SolCmd s txt -> do
-      sols <- sol s <$> parseOrDie txt
+      e <- parseOrDie txt
+      let sols = withSolver s \mk -> solutions (mk e)
       if null sols
         then Text.putStrLn "UNSAT"
         else for_ sols (Text.putStrLn . renderSolution)
  where
   opts = info (helper <*> cmd) (fullDesc <> progDesc "Reshala - SAT solver")
-
-  sat = \case
-    Naive -> Naive.sat
-    Table -> Table.sat
-
-  sol = \case
-    Naive -> Naive.sol
-    Table -> Table.sol
 
   renderSolution m
     | Map.null m = "{}"
@@ -57,11 +52,11 @@ cmd =
       , command "sol" (info (SolCmd <$> solver <*> expr) (progDesc "List satisfying assignments"))
       ]
 
-solver :: Parser Solver
+solver :: Parser SolverChoice
 solver =
   asum
-    [ flag' Naive (long "naive" <> help "Use naive backtracking solver")
-    , flag Table Table (long "table" <> help "Use truth-table solver (default)")
+    [ flag' UseNaive (long "naive" <> help "Use naive backtracking solver")
+    , flag UseTable UseTable (long "table" <> help "Use truth-table solver (default)")
     ]
 
 expr :: Parser Text
@@ -73,3 +68,8 @@ parseOrDie t = case Parser.run "stdin" t of
     hPutStrLn stderr $ "Parse error:\n" <> err
     exitFailure
   Right e -> pure e
+
+withSolver :: SolverChoice -> (forall s. (Solver s) => (Expr -> s) -> r) -> r
+withSolver = \case
+  UseNaive -> \k -> k MkNaive
+  UseTable -> \k -> k MkTable
