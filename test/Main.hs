@@ -1,10 +1,15 @@
 module Main (main) where
 
 import Data.Foldable
+import Data.Map.Strict ((!))
 import Data.Map.Strict qualified as Map
 import Data.Set qualified as Set
-import Hedgehog (Gen, Property, forAll, property, (===))
+import Hedgehog hiding (Var)
 import Hedgehog.Gen qualified as Gen
+import Hedgehog.Range qualified as Range
+import Pre
+import Reshala.SAT.CNF
+import Reshala.SAT.CNF qualified as CNF
 import Reshala.SAT.Expr
 import Reshala.SAT.Solver.Naive qualified as Naive
 import Reshala.SAT.Solver.Table qualified as Table
@@ -62,14 +67,17 @@ propertyTests :: TestTree
 propertyTests =
   testGroup
     "properties"
-    [ testProperty "Naive.sat == Table.sat" prop_equivSat
-    , testProperty "Naive.sol == Table.sol" prop_equivSolutions
-    , testProperty "Every Naive solution satisfies expr" prop_naiveSolutionsSatisfy
-    , testProperty "Every Table solution satisfies expr" prop_tableSolutionsSatisfy
+    [ testProperty "Naive.sat == Table.sat" (withTests 500 prop_equivSat)
+    , testProperty "Naive.sol == Table.sol" (withTests 400 prop_equivSolutions)
+    , testProperty "Naive solutions satisfy expr" (withTests 300 prop_naiveSolutionsSatisfy)
+    , testProperty "Table solutions satisfy expr" (withTests 300 prop_tableSolutionsSatisfy)
+    , testProperty "Solutions only assign used vars" (withTests 300 prop_solutionKeysSubset)
+    , testProperty "No duplicate solutions" (withTests 300 prop_noDuplicates)
+    , testProperty "Expr equivalent to CNF under any assignment" (withTests 400 prop_exprCnfEquiv)
     ]
 
 genVar :: Gen Var
-genVar = Gen.element ['a' .. 'd']
+genVar = Gen.element ['a' .. 'z']
 
 genExpr :: Gen Expr
 genExpr =
@@ -86,27 +94,73 @@ genExpr =
 evalWith :: Solution -> Expr -> Bool
 evalWith env = \case
   Lit b -> b
-  Var v -> Map.findWithDefault False v env
+  Var v -> env ! v
   Not a -> not (evalWith env a)
   a :&: b -> evalWith env a && evalWith env b
   a :|: b -> evalWith env a || evalWith env b
 
+varsOf :: Expr -> Set Var
+varsOf = \case
+  Lit _ -> mempty
+  Var v -> Set.singleton v
+  Not a -> varsOf a
+  a :&: b -> varsOf a <> varsOf b
+  a :|: b -> varsOf a <> varsOf b
+
+genEnvFor :: Expr -> Gen Solution
+genEnvFor expr = do
+  let vs = toList (varsOf expr)
+  bs <- Gen.list (Range.singleton (length vs)) Gen.bool
+  pure (Map.fromList (zip vs bs))
+
+evalCNF :: Solution -> CNF -> Bool
+evalCNF env = \case
+  Bot -> False
+  CNF f
+    | Set.null f -> True
+    | otherwise -> all (any litTrue) f
+ where
+  litTrue = \case
+    Pos v -> env ! v
+    Neg v -> not (env ! v)
+
 prop_equivSat :: Property
 prop_equivSat = property do
-  e <- forAll genExpr
-  Naive.sat e === Table.sat e
+  expr <- forAll genExpr
+  Naive.sat expr === Table.sat expr
 
 prop_equivSolutions :: Property
 prop_equivSolutions = property do
-  e <- forAll genExpr
-  Set.fromList (Naive.sol e) === Set.fromList (Table.sol e)
+  expr <- forAll genExpr
+  Set.fromList (Naive.sol expr) === Set.fromList (Table.sol expr)
 
 prop_naiveSolutionsSatisfy :: Property
 prop_naiveSolutionsSatisfy = property do
-  e <- forAll genExpr
-  for_ (Naive.sol e) \env -> evalWith env e === True
+  expr <- forAll genExpr
+  for_ (Naive.sol expr) \env -> evalWith env expr === True
 
 prop_tableSolutionsSatisfy :: Property
 prop_tableSolutionsSatisfy = property do
-  e <- forAll genExpr
-  for_ (Table.sol e) \env -> evalWith env e === True
+  expr <- forAll genExpr
+  for_ (Table.sol expr) \env -> evalWith env expr === True
+
+prop_solutionKeysSubset :: Property
+prop_solutionKeysSubset = property do
+  expr <- forAll genExpr
+  let vars = varsOf expr
+  for_ (Naive.sol expr) \env -> Set.fromList (Map.keys env) `Set.isSubsetOf` vars === True
+  for_ (Table.sol expr) \env -> Set.fromList (Map.keys env) `Set.isSubsetOf` vars === True
+
+prop_noDuplicates :: Property
+prop_noDuplicates = property do
+  expr <- forAll genExpr
+  let n = Naive.sol expr
+  let t = Table.sol expr
+  length n === Set.size (Set.fromList n)
+  length t === Set.size (Set.fromList t)
+
+prop_exprCnfEquiv :: Property
+prop_exprCnfEquiv = property do
+  expr <- forAll genExpr
+  env <- forAll (genEnvFor expr)
+  evalWith env expr === evalCNF env (CNF.fromExpr expr)
