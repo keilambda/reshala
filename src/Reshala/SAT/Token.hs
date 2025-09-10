@@ -4,6 +4,7 @@ module Reshala.SAT.Token
   ( P
   , Tok (..)
   , toks
+  , run
   ) where
 
 import Data.Text qualified as Text
@@ -62,3 +63,6 @@ kwOrIdent = do
     "true" -> True
     "false" -> False
     _ -> Ident txt
+
+run :: FilePath -> Text -> Either String (List Tok)
+run filepath = over _Left errorBundlePretty . runParser (sc *> toks <* sc <* eof) filepath
