@@ -65,4 +65,9 @@ test-suite reshala-test
   main-is:        Main.hs
   build-depends:
     , base
+    , containers
+    , hedgehog
     , reshala
+    , tasty
+    , tasty-hedgehog
+    , tasty-hunit
