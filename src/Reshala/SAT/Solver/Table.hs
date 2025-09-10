@@ -5,6 +5,7 @@ module Reshala.SAT.Solver.Table
 
 import Control.Monad (replicateM)
 import Data.Functor.Foldable
+import Data.Map.Strict ((!))
 import Data.Map.Strict qualified as Map
 import Data.Set qualified as Set
 import Pre
@@ -14,7 +15,7 @@ import Reshala.SAT.Expr
 eval :: Solution -> Expr -> Bool
 eval env = cata \case
   LitF b -> b
-  VarF v -> Map.findWithDefault False v env
+  VarF v -> env ! v
   NotF b -> not b
   a :&:$ b -> a && b
   a :|:$ b -> a || b
