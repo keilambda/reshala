@@ -17,6 +17,7 @@ common defaults
     NoFieldSelectors
     OrPatterns
     PatternSynonyms
+    OverloadedStrings
 
 common warnings
   ghc-options:
@@ -30,6 +31,9 @@ common warnings
     -Wno-unused-packages -Wno-missing-role-annotations
     -Wno-missing-poly-kind-signatures
     -Wno-missing-pattern-synonym-signatures
+    -Wno-missing-pattern-synonym-signatures
+    -Wno-missing-exported-pattern-synonym-signatures
+    -Wno-missing-export-lists 
 
 common deps
   build-depends:
