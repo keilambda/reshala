@@ -56,7 +56,6 @@ library
   exposed-modules:
     Pre
     Reshala
-    Reshala.AST
     Reshala.SAT
     Reshala.SAT.CNF
     Reshala.SAT.Expr
@@ -64,6 +63,10 @@ library
     Reshala.SAT.Solver.Naive
     Reshala.SAT.Solver.Table
     Reshala.SAT.Token
+    Reshala.Ya
+    Reshala.Ya.AST
+    Reshala.Ya.Instances
+    Reshala.Ya.Utils
 
   default-extensions: NoImplicitPrelude
 
