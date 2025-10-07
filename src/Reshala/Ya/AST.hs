@@ -2,9 +2,11 @@ module Reshala.Ya.AST where
 
 import Ya
 import Ya.ASCII
+import Data.Map (Map)
 import Data.Set (Set, insert)
 
 import Reshala.Ya.Instances ()
+import Reshala.Ya.Conversion (find)
 
 type Variable = Nonempty List `T'I` Letter
 
@@ -19,6 +21,8 @@ pattern Expression x xx = LT (LRT (Final x) (Twice xx)) :: Expression e
 pattern Conjunct x = LT (LRT (Final (AND Unit)) (Twice x)) :: Expression e
 pattern Disjunct x = LT (LRT (Final (OR Unit)) (Twice x)) :: Expression e
 pattern Negation x = RT (Alone x) :: Expression e
+
+{-# COMPLETE Conjunct, Disjunct, Negation #-}
 
 type Value = Variable `S` Boolean
 
@@ -35,3 +39,19 @@ gather_all_variables x = x `yokl` Forth `ha` Apply `ha` State `ha` Event `ha__` 
 -- IDEA: Try to make it more explicit with `Match` functor
 substitute_single_variable :: Variable `P` Boolean `AR__` Instruction Expression Value `AR_` Instruction Expression Value
 substitute_single_variable (These name value) x = x `yo_` this `ho` Variable `la` Variable `hu` Literal value `ha_` (`lu'q` name) `la` Literal
+
+-- variable :: Variable `AR___` Stops `T` Variable `JNT` Given `T` Map Variable Boolean `T'I__` Boolean
+variable k = intro @(Stops `T` Variable `JNT` Given `T` Map Variable Boolean) `hv` Unit
+ `yuk___` Apply `ha` Given `hv` is @(Map Variable Boolean)
+ `yok___` Check `ha` find @Variable k
+
+-- dereference :: Instruction Expression Value `AR___` Stops `T` Variable `JNT` Given `T` Map Variable Boolean `T'I_` Instruction Expression Boolean
+dereference x = x `yokl` Forth `ha` Apply `ha__` variable `la` intro
+
+-- proceed :: Expression Boolean `AR___` Boolean
+proceed (Negation x) = Boolean `ha` not `hv` x
+proceed (Conjunct x) = x `ho` Every `yp'yu` Unit
+proceed (Disjunct x) = x `ho` First `ys'yu` Unit
+
+-- evaluate :: Instruction Expression Boolean `AR___` Boolean
+evaluate = unwrap @(AR) @(Instruction Expression Boolean) `ho___` cata `hv__` is @Boolean `la` proceed

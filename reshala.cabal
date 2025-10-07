@@ -33,7 +33,8 @@ common warnings
     -Wno-missing-pattern-synonym-signatures
     -Wno-missing-pattern-synonym-signatures
     -Wno-missing-exported-pattern-synonym-signatures
-    -Wno-missing-export-lists 
+    -Wno-missing-export-lists
+    -Wno-missing-signatures
 
 common deps
   build-depends:
@@ -66,7 +67,7 @@ library
     Reshala.Ya
     Reshala.Ya.AST
     Reshala.Ya.Instances
-    Reshala.Ya.Utils
+    Reshala.Ya.Conversion
 
   default-extensions: NoImplicitPrelude
 
