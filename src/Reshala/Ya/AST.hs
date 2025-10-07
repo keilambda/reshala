@@ -41,17 +41,19 @@ substitute_single_variable :: Variable `P` Boolean `AR__` Instruction Expression
 substitute_single_variable (These name value) x = x `yo_` this `ho` Variable `la` Variable `hu` Literal value `ha_` (`lu'q` name) `la` Literal
 
 -- variable :: Variable `AR___` Stops `T` Variable `JNT` Given `T` Map Variable Boolean `T'I__` Boolean
+-- dereference :: Instruction Expression Value `AR___` Stops `T` Variable `JNT` Given `T` Map Variable Boolean `T'I_` Instruction Expression Boolean
+-- proceed :: Expression Boolean `AR___` Boolean
+-- evaluate :: Instruction Expression Boolean `AR___` Boolean
+
 variable k = intro @(Stops `T` Variable `JNT` Given `T` Map Variable Boolean) `hv` Unit
  `yuk___` Apply `ha` Given `hv` is @(Map Variable Boolean)
  `yok___` Check `ha` find @Variable k
 
--- dereference :: Instruction Expression Value `AR___` Stops `T` Variable `JNT` Given `T` Map Variable Boolean `T'I_` Instruction Expression Boolean
 dereference x = x `yokl` Forth `ha` Apply `ha__` variable `la` intro
 
--- proceed :: Expression Boolean `AR___` Boolean
 proceed (Negation x) = Boolean `ha` not `hv` x
 proceed (Conjunct x) = x `ho` Every `yp'yu` Unit
 proceed (Disjunct x) = x `ho` First `ys'yu` Unit
 
--- evaluate :: Instruction Expression Boolean `AR___` Boolean
-evaluate = unwrap @(AR) @(Instruction Expression Boolean) `ho___` cata `hv__` is @Boolean `la` proceed
+evaluate = cata `hv__` is @Boolean `la` proceed
+ `ha__` unwrap @(AR) @(Instruction Expression Boolean)
