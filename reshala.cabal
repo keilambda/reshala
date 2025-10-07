@@ -16,6 +16,8 @@ common defaults
     MultilineStrings
     NoFieldSelectors
     OrPatterns
+    PatternSynonyms
+    OverloadedStrings
 
 common warnings
   ghc-options:
@@ -28,6 +30,11 @@ common warnings
     -Wno-monomorphism-restriction -Wno-prepositive-qualified-module
     -Wno-unused-packages -Wno-missing-role-annotations
     -Wno-missing-poly-kind-signatures
+    -Wno-missing-pattern-synonym-signatures
+    -Wno-missing-pattern-synonym-signatures
+    -Wno-missing-exported-pattern-synonym-signatures
+    -Wno-missing-export-lists
+    -Wno-missing-signatures
 
 common deps
   build-depends:
@@ -41,6 +48,8 @@ common deps
     , parser-combinators
     , recursion-schemes
     , text
+    , ya
+    , ya-ascii
 
 library
   import:             defaults, warnings, deps
@@ -55,6 +64,10 @@ library
     Reshala.SAT.Solver.Naive
     Reshala.SAT.Solver.Table
     Reshala.SAT.Token
+    Reshala.Ya
+    Reshala.Ya.AST
+    Reshala.Ya.Instances
+    Reshala.Ya.Conversion
 
   default-extensions: NoImplicitPrelude
 
